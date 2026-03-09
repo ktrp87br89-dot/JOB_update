@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HR Admin Dashboard | ระบบจัดการข้อมูลผู้สมัครงาน</title>
+    <style>
+        /* สไตล์ระดับพรีเมียม */
+        :root {
+            --primary: #0ea5e9;
+            --primary-hover: #0284c7;
+            --bg-color: #f8fafc;
+            --text-dark: #0f172a;
+            --text-light: #64748b;
+            --white: #ffffff;
+            --border-color: #e2e8f0;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            color: var(--text-dark);
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        #login-container {
+            background: var(--white);
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            margin-top: 10vh;
+        }
+
+        h2 { margin-top: 0; color: var(--text-dark); }
+        p { color: var(--text-light); font-size: 14px; margin-bottom: 24px; }
+
+        input[type="password"] {
+            width: 90%;
+            padding: 12px 16px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 16px;
+            outline: none;
+            box-sizing: border-box;
+        }
+        input[type="password"]:focus { border-color: var(--primary); }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background-color: var(--primary);
+            color: var(--white);
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        button:hover { background-color: var(--primary-hover); }
+
+        .error-text { color: #ef4444; font-size: 14px; margin-bottom: 15px; display: none; }
+
+        #dashboard-container {
+            display: none;
+            width: 100%;
+            max-width: 1200px;
+            background: var(--white);
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 20px;
+            margin-bottom: 20px;
+        }
+
+        .header-title { display: flex; flex-direction: column; }
+        .last-update { font-size: 12px; color: var(--text-light); margin-top: 5px; }
+        .logout-btn { background-color: #ef4444; width: auto; padding: 8px 16px; font-size: 14px; }
+        .logout-btn:hover { background-color: #dc2626; }
+
+        /* --- สไตล์สำหรับแถบเครื่องมือค้นหาและกรอง --- */
+        .filter-section {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 20px;
+            background: #f1f5f9;
+            padding: 15px;
+            border-radius: 8px;
+            align-items: center;
+        }
+
+        .filter-section input[type="text"], .filter-section select, .filter-section input[type="date"] {
+            padding: 10px 14px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .filter-section input[type="text"] {
+            flex-grow: 1;
+            min-width: 250px;
+        }
+
+        .custom-date-group {
+            display: none; /* ซ่อนไว้ก่อน จะโชว์เมื่อเลือก "กำหนดเอง" */
+            align-items: center;
+            gap: 10px;
+        }
+
+        .table-responsive { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; white-space: nowrap; }
+        th, td { padding: 14px 16px; text-align: left; border-bottom: 1px solid var(--border-color); }
+        th { background-color: #f8fafc; font-weight: 600; color: var(--text-light); position: sticky; top: 0; }
+        tr:hover { background-color: #f1f5f9; }
+        .loading { text-align: center; color: var(--text-light); padding: 40px; font-style: italic; }
+        .new-badge { background-color: #10b981; color: white; padding: 2px 8px; border-radius: 12px; font-size: 11px; margin-left: 8px; font-weight: bold; }
+        .no-result { text-align: center; padding: 30px; color: var(--text-light); display: none; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div id="login-container">
+        <h2>🔒 เข้าสู่ระบบ HR Admin</h2>
+        <p>กรุณากรอกรหัสผ่านเพื่อเข้าถึงข้อมูลผู้สมัครงาน</p>
+        <div id="error-msg" class="error-text">รหัสผ่านไม่ถูกต้อง กรุณาลองใหม่</div>
+        <input type="password" id="password-input" placeholder="รหัสผ่านผู้ดูแลระบบ" onkeypress="handleKeyPress(event)">
+        <button onclick="checkPassword()">เข้าสู่ระบบ</button>
+    </div>
+
+    <div id="dashboard-container">
+        <div class="header">
+            <div class="header-title">
+                <h2 style="margin:0;">👥 ข้อมูลผู้สมัครงาน (มีค.69)</h2>
+                <span class="last-update" id="update-time">อัปเดตล่าสุด: กำลังโหลด...</span>
+            </div>
+            <button class="logout-btn" onclick="logout()">ออกจากระบบ</button>
+        </div>
+        
+        <div class="filter-section" id="filter-tools" style="display: none;">
+            <input type="text" id="search-input" placeholder="🔍 ค้นหา ชื่อ-นามสกุล หรือ เบอร์โทรศัพท์..." onkeyup="applyFilters()">
+            
+            <select id="date-filter" onchange="toggleCustomDate(); applyFilters();">
+                <option value="all">📅 ทุกช่วงเวลา</option>
+                <option value="7">ย้อนหลัง 7 วัน</option>
+                <option value="15">ย้อนหลัง 15 วัน</option>
+                <option value="30">ย้อนหลัง 1 เดือน</option>
+                <option value="custom">⚙️ กำหนดช่วงวันเอง...</option>
+            </select>
+
+            <div class="custom-date-group" id="custom-date-group">
+                <input type="date" id="start-date" onchange="applyFilters()">
+                <span style="color: var(--text-light); font-size: 14px;">ถึง</span>
+                <input type="date" id="end-date" onchange="applyFilters()">
+            </div>
+        </div>
+
+        <div id="loading" class="loading">กำลังซิงค์ข้อมูลจากฐานข้อมูล... ⏳</div>
+        
+        <div class="table-responsive">
+            <table id="data-table" style="display:none;">
+                <thead id="table-head"></thead>
+                <tbody id="table-body"></tbody>
+            </table>
+            <div id="no-result-msg" class="no-result">❌ ไม่พบข้อมูลที่ตรงกับเงื่อนไขการค้นหา</div>
+        </div>
+    </div>
+
+    <script>
+        // 🔴 นำ URL ของ Web App จาก Google Apps Script มาวางที่นี่
+        const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbx9Q6qjSzfvXfeYVJIiTd_HZKCQzeoT_VM6lJUmlqAZrOu-pf6G38bgKLbwu3VKbdI/exec";
+        const ADMIN_PASSWORD = "adminhr0208";
+        
+        let refreshInterval;
+        let allDataRows = []; // ตัวแปรเก็บข้อมูลทั้งหมดไว้กรอง
+        let tableHeaders = []; // เก็บหัวตาราง
+
+        function checkPassword() {
+            const input = document.getElementById("password-input").value;
+            if(input === ADMIN_PASSWORD) {
+                document.getElementById("login-container").style.display = "none";
+                document.getElementById("dashboard-container").style.display = "block";
+                document.getElementById("password-input").value = ""; 
+                document.getElementById("error-msg").style.display = "none";
+                
+                fetchData();
+                refreshInterval = setInterval(fetchData, 60000); 
+            } else {
+                document.getElementById("error-msg").style.display = "block";
+            }
+        }
+
+        function handleKeyPress(e) { if(e.key === 'Enter') checkPassword(); }
+
+        function logout() {
+            clearInterval(refreshInterval);
+            document.getElementById("dashboard-container").style.display = "none";
+            document.getElementById("login-container").style.display = "block";
+            document.getElementById("filter-tools").style.display = "none";
+            document.getElementById("data-table").style.display = "none";
+            document.getElementById("loading").style.display = "block";
+        }
+
+        // แสดง/ซ่อน ช่องเลือกวันที่แบบกำหนดเอง
+        function toggleCustomDate() {
+            const filterValue = document.getElementById("date-filter").value;
+            const customGroup = document.getElementById("custom-date-group");
+            customGroup.style.display = (filterValue === "custom") ? "flex" : "none";
+        }
+
+        async function fetchData() {
+            try {
+                document.getElementById("update-time").innerText = "กำลังอัปเดตข้อมูล...";
+                const response = await fetch(GAS_WEB_APP_URL);
+                const data = await response.json();
+                
+                if (data && data.length > 1) {
+                    tableHeaders = data[0];
+                    // เก็บข้อมูลและกลับด้าน (Reverse) ให้คนใหม่ล่าสุดอยู่บนสุดเสมอ
+                    allDataRows = data.slice(1).reverse();
+                    
+                    document.getElementById("filter-tools").style.display = "flex";
+                    applyFilters(); // นำข้อมูลไปสร้างตารางพร้อมใช้งานตัวกรอง
+                } else {
+                    document.getElementById("loading").innerText = "ยังไม่มีข้อมูลผู้สมัครในระบบ";
+                }
+                
+                const now = new Date();
+                document.getElementById("update-time").innerText = "อัปเดตล่าสุด: " + now.toLocaleTimeString('th-TH');
+            } catch (error) {
+                document.getElementById("loading").innerText = "❌ ไม่สามารถเชื่อมต่อฐานข้อมูลได้";
+                document.getElementById("update-time").innerText = "การเชื่อมต่อขัดข้อง";
+            }
+        }
+
+        // ฟังก์ชันแปลงวันที่จาก Google Sheet ให้เป็น Object Date ของ Javascript
+        function parseSheetDate(dateStr) {
+            if (!dateStr || dateStr === "-") return null;
+            // แยกวันที่และเวลา (สมมติว่ารูปแบบคือ DD/MM/YYYY HH:mm:ss หรือคล้ายกัน)
+            let datePart = dateStr.split(" ")[0];
+            let parts = datePart.split("/");
+            if (parts.length === 3) {
+                let day = parseInt(parts[0]);
+                let month = parseInt(parts[1]) - 1; // เดือนใน JS เริ่มที่ 0
+                let year = parseInt(parts[2]);
+                // เช็คว่าเป็นปี พ.ศ. หรือไม่ (ถ้าเกิน 2500 ให้แปลงเป็น ค.ศ.)
+                if (year > 2500) year -= 543;
+                return new Date(year, month, day);
+            }
+            return new Date(dateStr); // กรณีรูปแบบอื่น
+        }
+
+        // 🧠 ฟังก์ชันหลักสำหรับ กรองข้อมูล (Filter & Search)
+        function applyFilters() {
+            const searchText = document.getElementById("search-input").value.toLowerCase().trim();
+            const dateFilter = document.getElementById("date-filter").value;
+            const startDateStr = document.getElementById("start-date").value;
+            const endDateStr = document.getElementById("end-date").value;
+
+            // กรองข้อมูลตามเงื่อนไข
+            const filteredData = allDataRows.filter(row => {
+                // 1. ค้นหาจากข้อความ (ดัชนี 2 = ชื่อ, ดัชนี 4 = เบอร์โทร)
+                const name = (row[2] || "").toString().toLowerCase();
+                const phone = (row[4] || "").toString().toLowerCase();
+                const matchText = name.includes(searchText) || phone.includes(searchText);
+
+                if (!matchText) return false;
+
+                // 2. กรองจากวันที่ (ดัชนี 0 = ประทับเวลา)
+                if (dateFilter !== "all") {
+                    const rowDate = parseSheetDate(row[0]);
+                    if (!rowDate) return true; // ถ้าไม่มีข้อมูลวันที่ ให้แสดงไปเลย
+
+                    const today = new Date();
+                    today.setHours(23, 59, 59, 999); // ตั้งเวลาเป็นสิ้นสุดของวันนี้
+
+                    if (dateFilter === "custom") {
+                        if (startDateStr) {
+                            const start = new Date(startDateStr);
+                            start.setHours(0, 0, 0, 0);
+                            if (rowDate < start) return false;
+                        }
+                        if (endDateStr) {
+                            const end = new Date(endDateStr);
+                            end.setHours(23, 59, 59, 999);
+                            if (rowDate > end) return false;
+                        }
+                    } else {
+                        // กรณีเลือก 7, 15, 30 วัน
+                        const daysAgo = parseInt(dateFilter);
+                        const pastDate = new Date();
+                        pastDate.setDate(today.getDate() - daysAgo);
+                        pastDate.setHours(0, 0, 0, 0);
+
+                        if (rowDate < pastDate) return false;
+                    }
+                }
+                return true;
+            });
+
+            renderTable(filteredData);
+        }
+
+        // ฟังก์ชันวาดตาราง
+        function renderTable(dataToRender) {
+            const thead = document.getElementById("table-head");
+            const tbody = document.getElementById("table-body");
+            const loading = document.getElementById("loading");
+            const table = document.getElementById("data-table");
+            const noResultMsg = document.getElementById("no-result-msg");
+            
+            thead.innerHTML = "";
+            tbody.innerHTML = "";
+            loading.style.display = "none";
+
+            if (dataToRender.length === 0) {
+                table.style.display = "none";
+                noResultMsg.style.display = "block";
+                return;
+            } else {
+                table.style.display = "table";
+                noResultMsg.style.display = "none";
+            }
+
+            // สร้างหัวตาราง
+            let headerRow = document.createElement("tr");
+            tableHeaders.forEach(headerText => {
+                let th = document.createElement("th");
+                th.textContent = headerText;
+                headerRow.appendChild(th);
+            });
+            thead.appendChild(headerRow);
+
+            // สร้างเนื้อหาตาราง
+            dataToRender.forEach((rowData, index) => {
+                if(!rowData[0] || rowData[0] === "-") return; // ข้ามแถวว่าง
+
+                let tr = document.createElement("tr");
+                rowData.forEach((cellData, cellIndex) => {
+                    let td = document.createElement("td");
+                    
+                    // ป้ายกำกับ "ใหม่" จะติดให้คนบนสุด (ของข้อมูลทั้งหมด ไม่ใช่ข้อมูลที่กรองแล้ว)
+                    // เราเช็คว่าแถวนี้ตรงกับแถวแรกของ allDataRows หรือไม่
+                    if (cellIndex === 0 && rowData === allDataRows[0]) {
+                        td.innerHTML = `${cellData} <span class="new-badge">ใหม่ล่าสุด</span>`;
+                    } else {
+                        td.textContent = cellData;
+                    }
+                    tr.appendChild(td);
+                });
+                tbody.appendChild(tr);
+            });
+        }
+    </script>
+</body>
+</html>
