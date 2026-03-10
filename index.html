@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HR Admin Dashboard | ระบบจัดการข้อมูลผู้สมัครงาน</title>
     <style>
-        /* --- สไตล์ระดับพรีเมียม --- */
         :root {
             --primary: #0ea5e9;
             --primary-hover: #0284c7;
@@ -16,129 +15,33 @@
             --border-color: #e2e8f0;
         }
         
-        body {
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-color);
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            min-height: 100vh;
-            color: var(--text-dark);
-            padding: 20px;
-            box-sizing: border-box;
-        }
-
-        /* --- ส่วนของหน้า Login --- */
-        #login-container {
-            background: var(--white);
-            padding: 40px;
-            border-radius: 16px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 400px;
-            text-align: center;
-            margin-top: 10vh;
-        }
-
+        body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: var(--bg-color); margin: 0; display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; color: var(--text-dark); padding: 20px; box-sizing: border-box; }
+        #login-container { background: var(--white); padding: 40px; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); width: 100%; max-width: 400px; text-align: center; margin-top: 10vh; }
         h2 { margin-top: 0; color: var(--text-dark); }
         p { color: var(--text-light); font-size: 14px; margin-bottom: 24px; }
-
-        input[type="password"] {
-            width: 100%;
-            padding: 12px 16px;
-            margin-bottom: 20px;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            font-size: 16px;
-            outline: none;
-            box-sizing: border-box;
-        }
+        input[type="password"] { width: 100%; padding: 12px 16px; margin-bottom: 20px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 16px; outline: none; box-sizing: border-box; }
         input[type="password"]:focus { border-color: var(--primary); }
-
-        button {
-            width: 100%;
-            padding: 14px;
-            background-color: var(--primary);
-            color: var(--white);
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: 0.2s;
-        }
+        button { width: 100%; padding: 14px; background-color: var(--primary); color: var(--white); border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; transition: 0.2s; }
         button:hover { background-color: var(--primary-hover); }
-
         .error-text { color: #ef4444; font-size: 14px; margin-bottom: 15px; display: none; }
-
-        /* --- ส่วนของหน้า Dashboard --- */
-        #dashboard-container {
-            display: none;
-            width: 100%;
-            max-width: 1200px;
-            background: var(--white);
-            padding: 30px;
-            border-radius: 16px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        }
-
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 2px solid var(--border-color);
-            padding-bottom: 20px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-
+        
+        #dashboard-container { display: none; width: 100%; max-width: 1200px; background: var(--white); padding: 30px; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--border-color); padding-bottom: 20px; margin-bottom: 20px; flex-wrap: wrap; gap: 15px; }
         .header-title { display: flex; flex-direction: column; }
         .last-update { font-size: 12px; color: var(--text-light); margin-top: 5px; }
         .logout-btn { background-color: #ef4444; width: auto; padding: 8px 16px; font-size: 14px; }
         .logout-btn:hover { background-color: #dc2626; }
-
-        /* --- แถบเครื่องมือค้นหาและกรอง --- */
-        .filter-section {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            margin-bottom: 20px;
-            background: #f1f5f9;
-            padding: 15px;
-            border-radius: 8px;
-            align-items: center;
-        }
-
-        .filter-section input[type="text"], .filter-section select, .filter-section input[type="date"] {
-            padding: 10px 14px;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            font-size: 14px;
-            outline: none;
-            box-sizing: border-box;
-        }
-
-        .filter-section input[type="text"] {
-            flex-grow: 1;
-            min-width: 280px;
-        }
-
-        .custom-date-group {
-            display: none; 
-            align-items: center;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        /* --- ตารางข้อมูล --- */
+        
+        .filter-section { display: flex; flex-wrap: wrap; gap: 15px; margin-bottom: 20px; background: #f1f5f9; padding: 15px; border-radius: 8px; align-items: center; }
+        .filter-section input[type="text"], .filter-section select, .filter-section input[type="date"] { padding: 10px 14px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 14px; outline: none; box-sizing: border-box; }
+        .filter-section input[type="text"] { flex-grow: 1; min-width: 300px; }
+        .custom-date-group { display: none; align-items: center; gap: 10px; flex-wrap: wrap; }
+        
         .table-responsive { overflow-x: auto; border-radius: 8px; border: 1px solid var(--border-color); }
         table { width: 100%; border-collapse: collapse; white-space: nowrap; }
         th, td { padding: 14px 16px; text-align: left; border-bottom: 1px solid var(--border-color); }
         th { background-color: #f8fafc; font-weight: 600; color: var(--text-light); position: sticky; top: 0; }
         tr:hover { background-color: #f1f5f9; }
-        
         .loading { text-align: center; color: var(--text-light); padding: 40px; font-style: italic; }
         .new-badge { background-color: #10b981; color: white; padding: 2px 8px; border-radius: 12px; font-size: 11px; margin-left: 8px; font-weight: bold; }
         .no-result { text-align: center; padding: 30px; color: var(--text-light); display: none; font-weight: bold; }
@@ -148,7 +51,7 @@
 
     <div id="login-container">
         <h2>🔒 เข้าสู่ระบบ HR Admin</h2>
-        <p>กรุณากรอกรหัสผ่านเพื่อเข้าถึงข้อมูลผู้สมัครงาน (ชีท มีค.69)</p>
+        <p>กรุณากรอกรหัสผ่านเพื่อเข้าถึงข้อมูลผู้สมัครงาน</p>
         <div id="error-msg" class="error-text">รหัสผ่านไม่ถูกต้อง กรุณาลองใหม่</div>
         <input type="password" id="password-input" placeholder="รหัสผ่านผู้ดูแลระบบ" onkeypress="handleKeyPress(event)">
         <button onclick="checkPassword()">เข้าสู่ระบบ</button>
@@ -164,7 +67,7 @@
         </div>
         
         <div class="filter-section" id="filter-tools" style="display: none;">
-            <input type="text" id="search-input" placeholder="🔍 ค้นหา ชื่อผู้สมัคร, เบอร์โทร หรือ ชื่อเจ้าหน้าที่..." onkeyup="applyFilters()">
+            <input type="text" id="search-input" placeholder="🔍 ค้นหา ชื่อ, เบอร์โทร, ตำแหน่ง หรือ เจ้าหน้าที่..." onkeyup="applyFilters()">
             
             <select id="date-filter" onchange="toggleCustomDate(); applyFilters();">
                 <option value="all">📅 ทุกช่วงเวลา</option>
@@ -193,16 +96,15 @@
     </div>
 
     <script>
-        // 🔴🔴🔴 นำ URL ของ Web App จาก Google Apps Script มาวางตรงนี้ 🔴🔴🔴
+        // 🔴🔴🔴 นำ URL ของ Web App จาก Google Apps Script มาวางในบรรทัดด้านล่างนี้ 🔴🔴🔴
         const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbx9Q6qjSzfvXfeYVJIiTd_HZKCQzeoT_VM6lJUmlqAZrOu-pf6G38bgKLbwu3VKbdI/exec";
         
         const ADMIN_PASSWORD = "adminhr0208";
         
         let refreshInterval;
-        let allDataRows = []; // เก็บข้อมูลทั้งหมดจาก Sheet
-        let tableHeaders = []; // เก็บหัวตาราง
+        let allDataRows = []; 
+        let tableHeaders = []; 
 
-        // ระบบ Login
         function checkPassword() {
             const input = document.getElementById("password-input").value;
             if(input === ADMIN_PASSWORD) {
@@ -212,7 +114,7 @@
                 document.getElementById("error-msg").style.display = "none";
                 
                 fetchData();
-                refreshInterval = setInterval(fetchData, 60000); // รีเฟรชทุก 1 นาที
+                refreshInterval = setInterval(fetchData, 60000); 
             } else {
                 document.getElementById("error-msg").style.display = "block";
             }
@@ -220,7 +122,6 @@
 
         function handleKeyPress(e) { if(e.key === 'Enter') checkPassword(); }
 
-        // ระบบ Logout
         function logout() {
             clearInterval(refreshInterval);
             document.getElementById("dashboard-container").style.display = "none";
@@ -230,14 +131,12 @@
             document.getElementById("loading").style.display = "block";
         }
 
-        // แสดง/ซ่อน ช่องเลือกวันที่
         function toggleCustomDate() {
             const filterValue = document.getElementById("date-filter").value;
             const customGroup = document.getElementById("custom-date-group");
             customGroup.style.display = (filterValue === "custom") ? "flex" : "none";
         }
 
-        // ดึงข้อมูลจาก GAS
         async function fetchData() {
             try {
                 document.getElementById("update-time").innerText = "กำลังอัปเดตข้อมูล...";
@@ -246,7 +145,6 @@
                 
                 if (data && data.length > 1) {
                     tableHeaders = data[0];
-                    // สลับข้อมูลให้คนล่าสุดมาอยู่บนสุด
                     allDataRows = data.slice(1).reverse();
                     
                     document.getElementById("filter-tools").style.display = "flex";
@@ -269,7 +167,6 @@
             }
         }
 
-        // ตัวช่วยแปลงวันที่ของ Google Sheet
         function parseSheetDate(dateStr) {
             if (!dateStr || dateStr === "-") return null;
             let datePart = dateStr.split(" ")[0];
@@ -278,14 +175,12 @@
                 let day = parseInt(parts[0]);
                 let month = parseInt(parts[1]) - 1; 
                 let year = parseInt(parts[2]);
-                // จัดการกรณีเป็นปี พ.ศ.
                 if (year > 2500) year -= 543;
                 return new Date(year, month, day);
             }
             return new Date(dateStr); 
         }
 
-        // ระบบกรองข้อมูล (ค้นหา + วันที่)
         function applyFilters() {
             const searchText = document.getElementById("search-input").value.toLowerCase().trim();
             const dateFilter = document.getElementById("date-filter").value;
@@ -293,16 +188,16 @@
             const endDateStr = document.getElementById("end-date").value;
 
             const filteredData = allDataRows.filter(row => {
-                // ค้นหาจาก: ชื่อผู้สมัคร (index 2), เบอร์โทร (index 4), เจ้าหน้าที่ (index 5)
+                // อัปเดต Index ใหม่: ตำแหน่งคือ index 5, เจ้าหน้าที่คือ index 6
                 const name = (row[2] || "").toString().toLowerCase();
                 const phone = (row[4] || "").toString().toLowerCase();
-                const staff = (row[5] || "").toString().toLowerCase(); 
+                const position = (row[5] || "").toString().toLowerCase(); 
+                const staff = (row[6] || "").toString().toLowerCase(); 
                 
-                const matchText = name.includes(searchText) || phone.includes(searchText) || staff.includes(searchText);
+                const matchText = name.includes(searchText) || phone.includes(searchText) || position.includes(searchText) || staff.includes(searchText);
 
                 if (!matchText) return false;
 
-                // กรองวันที่ (ประทับเวลา คือ index 0)
                 if (dateFilter !== "all") {
                     const rowDate = parseSheetDate(row[0]);
                     if (!rowDate) return true; 
@@ -336,7 +231,6 @@
             renderTable(filteredData);
         }
 
-        // ระบบสร้างตาราง
         function renderTable(dataToRender) {
             const thead = document.getElementById("table-head");
             const tbody = document.getElementById("table-body");
@@ -357,7 +251,6 @@
                 noResultMsg.style.display = "none";
             }
 
-            // สร้างหัวตาราง
             let headerRow = document.createElement("tr");
             tableHeaders.forEach(headerText => {
                 let th = document.createElement("th");
@@ -366,15 +259,13 @@
             });
             thead.appendChild(headerRow);
 
-            // สร้างเนื้อหาตาราง
             dataToRender.forEach(rowData => {
-                if(!rowData[0] || rowData[0] === "-") return; // ข้ามบรรทัดว่าง
+                if(!rowData[0] || rowData[0] === "-") return; 
 
                 let tr = document.createElement("tr");
                 rowData.forEach((cellData, cellIndex) => {
                     let td = document.createElement("td");
                     
-                    // เช็คว่านี่คือข้อมูลแถวที่ใหม่ที่สุดของระบบหรือไม่ (เช็คจาก allDataRows แถวแรก)
                     if (cellIndex === 0 && rowData === allDataRows[0]) {
                         td.innerHTML = `${cellData} <span class="new-badge">ใหม่ล่าสุด</span>`;
                     } else {
@@ -388,4 +279,3 @@
     </script>
 </body>
 </html>
-
